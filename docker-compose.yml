@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15-alpine3.18
+    restart: always
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-bagondb}
+      - POSTGRES_USER=${POSTGRES_USER:-bagon}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-bagon}
+    volumes:
+      - ${PGDATA_DIR:-pgdata}:/var/lib/postgresql/data
+    ports:
+      - "${DOCKER_DB_PORT}:5432"
+    networks:
+      - bridge
+  django:
+    build: ./
+    restart: always
+    depends_on:
+      - db
+    volumes:
+      - ./:/var/opt/bagon
+    ports:
+      - "${DOCKER_DJANGO_PORT}:8000"
+    networks:
+      - bridge
+
+networks:
+  bridge:
+    driver: bridge
+
+volumes:
+  pgdata:
+    driver: local
