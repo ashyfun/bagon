@@ -15,6 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.urls import path
+from webapp.apps.orders.urls import order_router
 
 urlpatterns = [
+    path('api/v1/', order_router.routes),
 ]

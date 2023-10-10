@@ -10,7 +10,7 @@ class TimeStampedModel(models.Model):
 
 
 class TelegramUserModel(TimeStampedModel):
-    user_id = models.BigAutoField(primary=True)
+    user_id = models.BigAutoField(primary_key=True)
     username = models.CharField(max_length=32, unique=True)
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64, null=True, blank=True)
@@ -18,6 +18,6 @@ class TelegramUserModel(TimeStampedModel):
 
 class OrderModel(TimeStampedModel):
     tg_user = models.ForeignKey(TelegramUserModel, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
+    name = models.CharField()
     price = models.PositiveIntegerField()
     amount = models.PositiveSmallIntegerField(default=1)

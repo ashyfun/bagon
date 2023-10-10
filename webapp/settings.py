@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from os import getenv
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-*f&4qr6wo@pde$v)&@la=y*hdfo$glb107r@#e^89x9=!lwxwu'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = getenv('DEBUG', 'true').strip().lower() in ['true', 'on', '1']
+DEBUG = os.environ.get('DEBUG', 'true').strip().lower() in ['true', 'on', '1']
 
 ALLOWED_HOSTS = ['*'] if DEBUG else []
 
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'webapp.apps.orders',
 ]
 
 MIDDLEWARE = [
@@ -77,12 +78,12 @@ WSGI_APPLICATION = 'webapp.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': getenv('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
-        'NAME': getenv('POSTGRES_DB', 'bagondb'),
-        'HOST': getenv('DB_HOST', 'db'),
-        'PORT': getenv('DB_PORT', '5432'),
-        'USER': getenv('POSTGRES_USER', 'bagon'),
-        'PASSWORD': getenv('POSTGRES_PASSWORD', 'bagon'),
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.postgresql_psycopg2'),
+        'NAME': os.environ.get('POSTGRES_DB', 'bagondb'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'USER': os.environ.get('POSTGRES_USER', 'bagon'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'bagon'),
     }
 }
 
@@ -127,3 +128,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+WEB_APP_URL = os.environ.get('WEB_APP_URL')
