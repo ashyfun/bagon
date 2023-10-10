@@ -130,4 +130,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 BOT_TOKEN = os.environ.get('BOT_TOKEN')
-WEB_APP_URL = os.environ.get('WEB_APP_URL')
+CHAT_ID = os.environ.get('CHAT_ID')

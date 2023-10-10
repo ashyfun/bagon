@@ -25,10 +25,12 @@ if settings.BOT_TOKEN:
 
 
 @dp.message()
-async def send_message(user_id: int, text: str):
+async def send_message(user_id: int, username: str, text: str):
     if not bot:
         return
     await bot.send_message(user_id, text, parse_mode=ParseMode.HTML)
+    if settings.CHAT_ID:
+        await bot.send_message(settings.CHAT_ID, f'@{username}{text}', parse_mode=ParseMode.HTML)
 
 
 async def write(data):
@@ -53,7 +55,7 @@ class OrderList(APIView):
         )
         async def run():
             await asyncio.gather(
-                send_message(validated_data['user']['id'], message),
+                send_message(validated_data['user']['id'], validated_data['user']['username'], message),
                 write('Write data...'),
             )
         loop.run_until_complete(run())
