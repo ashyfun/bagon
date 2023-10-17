@@ -29,7 +29,9 @@ class OrderModel(TimeStampedModel):
 
     @property
     def order_number(self):
-        return self.created_at.strftime('%d%m%H%M') + '-' + str(self.products.count())
+        amount = str(self.products.count())
+        leading_zeros = (4 - len(amount)) * '0'
+        return self.created_at.strftime('%d%m%H%M') + str(self.id) + '-' + leading_zeros + amount
 
     def __str__(self):
         return self.order_number
