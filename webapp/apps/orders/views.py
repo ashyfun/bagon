@@ -8,13 +8,23 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from webapp.apps.orders.models import TelegramUserModel, OrderModel
-from webapp.apps.orders.serializers import OrderSerializer
+from webapp.apps.orders.models import TelegramUserModel, ProductModel, OrderModel
+from webapp.apps.orders.serializers import TelegramUserSerializer, ProductSerializer, OrderSerializer
 
 ORDER_MESSAGE = """
-Товар: <i>{}</i>
-Стоимость: <b>{}</b>
-Количество: <b>{}</b>
+<b>Заказ сформирован!</b>
+
+Имя клиента: <i>{}</i>
+Получатель: <i>{}</i>
+Заказ: <i>{}</i>
+
+<b>Состав заказа:</b>
+
+-
+
+<b>Стоимость</b>: <i>0 RUB</i>
+
+В ближайшее время для подтверждения заказа с Вами свяжется менеджер @BagOnStore
 """
 
 loop = asyncio.new_event_loop()
@@ -34,47 +44,58 @@ async def send_message(user_id: int, username: str, text: str):
         await bot.send_message(settings.CHAT_ID, f'@{username}{text}', parse_mode=ParseMode.HTML)
 
 
-def save_to_db(data):
-    data_tg_user = data['tg_user']
+def create_order(user, products):
     tg_user, _ = TelegramUserModel.objects.get_or_create(
-        user_id=data_tg_user['user_id'],
+        user_id=user['id'],
         defaults={
-            'username': data_tg_user['username'],
-            'first_name': data_tg_user['first_name'],
-            'last_name': data_tg_user['last_name'],
+            'username': user['username'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'phone_number': user['phone_number'],
         }
     )
-    price = re.sub(r'[^\d]*(\d+).*', '\g<1>', data['price'])
-    OrderModel.objects.create(
-        tg_user=tg_user,
-        name=data['name'],
-        price=price
-    )
+    order = OrderModel.objects.create(tg_user=tg_user)
+    for product in products:
+        name = re.sub(r'(<br>|<\/?span[^>]*>)', '', product['name'])
+        price = re.sub(r'[^\d]*(\d+).*', '\g<1>', product['price'])
+        obj = ProductModel.objects.create(
+            name=name,
+            price=price,
+            amount=product['amount'],
+        )
+        order.products.add(obj)
+
+    order.save()
+    return order
 
 
 class OrderList(APIView):
 
     def get(self, request):
         orders = OrderModel.objects.all()
-        serializer = OrderSerializer(orders, many=True)
+        serializer = OrderSerializer(orders)
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = OrderSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+        user_serializer = TelegramUserSerializer(data=request.data.get('user', {}))
+        if not user_serializer.is_valid():
+            return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        validated_data = serializer.validated_data
-        validated_data['name'] = re.sub(r'(<br>|<\/?span[^>]*>)', '', validated_data['name'])
+        product_serializer = ProductSerializer(data=request.data.get('products', []), many=True)
+        if not product_serializer.is_valid():
+            return Response(product_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        user_data = user_serializer.validated_data
+        products_data = product_serializer.validated_data
+        order = create_order(user_data, products_data)
         message = ORDER_MESSAGE.format(
-            validated_data['name'],
-            validated_data['price'],
-            validated_data['amount'],
+            user_data['first_name'],
+            user_data['username'],
+            order.order_number,
         )
-        save_to_db(validated_data),
         async def run():
             await asyncio.gather(
-                send_message(validated_data['tg_user']['user_id'], validated_data['tg_user']['username'], message),
+                send_message(user_data['user_id'], user_data['username'], message),
             )
-        loop.run_until_complete(run())
+        # loop.run_until_complete(run())
         return Response(status=status.HTTP_201_CREATED)
