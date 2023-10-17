@@ -46,7 +46,7 @@ async def send_message(user_id: int, username: str, text: str):
 
 def create_order(user, products):
     tg_user, _ = TelegramUserModel.objects.get_or_create(
-        user_id=user['id'],
+        user_id=user['user_id'],
         defaults={
             'username': user['username'],
             'first_name': user['first_name'],
@@ -73,7 +73,7 @@ class OrderList(APIView):
 
     def get(self, request):
         orders = OrderModel.objects.all()
-        serializer = OrderSerializer(orders)
+        serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
     def post(self, request):
