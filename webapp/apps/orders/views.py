@@ -15,14 +15,11 @@ ORDER_MESSAGE = """
 <b>Заказ сформирован!</b>
 
 Имя клиента: <i>{}</i>
-Получатель: <i>{}</i>
+Получатель: <i>@{}</i>
 Заказ: <i>{}</i>
 
 <b>Состав заказа:</b>
-
--
-
-<b>Стоимость</b>: <i>0 RUB</i>
+{}
 
 В ближайшее время для подтверждения заказа с Вами свяжется менеджер @BagOnStore
 """
@@ -36,12 +33,12 @@ if settings.BOT_TOKEN:
 
 
 @dp.message()
-async def send_message(user_id: int, username: str, text: str):
+async def send_message(user_id: int, text: str):
     if not bot:
         return
     await bot.send_message(user_id, text, parse_mode=ParseMode.HTML)
     if settings.CHAT_ID:
-        await bot.send_message(settings.CHAT_ID, f'@{username}{text}', parse_mode=ParseMode.HTML)
+        await bot.send_message(settings.CHAT_ID, text, parse_mode=ParseMode.HTML)
 
 
 def create_order(user, products):
@@ -56,7 +53,7 @@ def create_order(user, products):
     )
     order = OrderModel.objects.create(tg_user=tg_user)
     for product in products:
-        name = re.sub(r'(<br>|<\/?span[^>]*>)', '', product['name'])
+        name = re.sub(r'<\/?[^>]*>', '', product['name'])
         price = re.sub(r'[^\d]*(\d+).*', '\g<1>', product['price'])
         obj = ProductModel.objects.create(
             name=name,
@@ -92,10 +89,11 @@ class OrderList(APIView):
             user_data['first_name'],
             user_data['username'],
             order.order_number,
+            order,
         )
         async def run():
             await asyncio.gather(
-                send_message(user_data['user_id'], user_data['username'], message),
+                send_message(user_data['user_id'], message),
             )
-        # loop.run_until_complete(run())
+        loop.run_until_complete(run())
         return Response(status=status.HTTP_201_CREATED)
