@@ -27,18 +27,18 @@ ORDER_MESSAGE = """
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
-bot, dp = None, Dispatcher()
+bot = None
 if settings.BOT_TOKEN:
     bot = Bot(settings.BOT_TOKEN)
 
 
-@dp.message()
 async def send_message(user_id: int, text: str):
     if not bot:
         return
     await bot.send_message(user_id, text, parse_mode=ParseMode.HTML)
     if settings.CHAT_ID:
         await bot.send_message(settings.CHAT_ID, text, parse_mode=ParseMode.HTML)
+    await bot.session.close()
 
 
 def create_order(user, products):
