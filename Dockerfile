@@ -9,5 +9,7 @@ RUN pip install -U pip \
     && pip install -r requirements.txt \
     && pip cache purge
 
+COPY ./ ./
+
 EXPOSE 8000
 CMD [ "python", "manage.py", "runserver", "-v 3", "0.0.0.0:8000" ]
