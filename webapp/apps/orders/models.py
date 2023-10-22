@@ -14,7 +14,7 @@ class TelegramUserModel(TimeStampedModel):
     username = models.CharField(max_length=32, unique=True)
     first_name = models.CharField(max_length=64)
     last_name = models.CharField(max_length=64, null=True, blank=True)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
 
 
 class ProductModel(TimeStampedModel):

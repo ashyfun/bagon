@@ -31,6 +31,10 @@ ALLOWED_HOSTS = ['*'] if DEBUG else []
 
 # Application definition
 
+LOCAL_APPS = [
+    'webapp.apps.orders',
+]
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -39,8 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'webapp.apps.orders',
-]
+] + LOCAL_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

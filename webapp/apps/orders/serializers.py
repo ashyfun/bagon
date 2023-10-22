@@ -6,7 +6,7 @@ class TelegramUserSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=32)
     first_name = serializers.CharField(max_length=64)
     last_name = serializers.CharField(required=False, allow_blank=True, max_length=64)
-    phone_number = serializers.CharField(max_length=15)
+    phone_number = serializers.CharField(required=False, allow_blank=True, max_length=15)
 
 
 class ProductSerializer(serializers.Serializer):
