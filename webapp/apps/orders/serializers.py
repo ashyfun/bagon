@@ -16,5 +16,6 @@ class ProductSerializer(serializers.Serializer):
 
 
 class OrderSerializer(serializers.Serializer):
+    id = serializers.PrimaryKeyRelatedField(read_only=True)
     tg_user = TelegramUserSerializer()
     products = ProductSerializer(many=True)

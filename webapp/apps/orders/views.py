@@ -24,6 +24,12 @@ ORDER_MESSAGE = """
 В ближайшее время для подтверждения заказа с Вами свяжется менеджер @BagOnStore
 """
 
+ORDER_DETAIL_MESSAGE = """
+Имя клиента: <i>{}</i>
+Заказ: <i>{}</i>
+Номер клиента: <i>{}</i>
+"""
+
 loop = asyncio.new_event_loop()
 asyncio.set_event_loop(loop)
 
@@ -97,3 +103,15 @@ class OrderList(APIView):
             )
         loop.run_until_complete(run())
         return Response(status=status.HTTP_201_CREATED)
+
+
+class OrderDetail(APIView):
+
+    def get(self, request, pk):
+        try:
+            order = OrderModel.objects.get(pk=pk)
+        except OrderModel.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = OrderSerializer(order)
+        return Response(serializer.data)

@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from webapp.apps.orders.views import OrderList
+from webapp.apps.orders.views import OrderList, OrderDetail
 
 
 class OrderRouter:
@@ -22,4 +22,5 @@ class OrderRouter:
 order_router = OrderRouter()
 order_router.register([
     (r'orders', OrderList),
+    (r'orders/<int:pk>', OrderDetail),
 ])
