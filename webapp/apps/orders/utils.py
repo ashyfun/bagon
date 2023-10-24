@@ -14,6 +14,8 @@ async def send_message(user_id: int, text: str):
     if not bot:
         return
     await bot.send_message(user_id, text, parse_mode=ParseMode.HTML)
+    if settings.CHAT_ID:
+        await bot.send_message(settings.CHAT_ID, text, parse_mode=ParseMode.HTML)
     await bot.session.close()
 
 
