@@ -3,3 +3,4 @@ Django==4.2.6
 djangorestframework==3.14.0
 django-cors-headers==4.3.0
 psycopg2==2.9.9
+python_dotenv==1.0.0

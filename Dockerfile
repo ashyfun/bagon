@@ -12,4 +12,4 @@ RUN pip install -U pip \
 COPY ./ ./
 
 EXPOSE 8000
-CMD [ "python", "manage.py", "runserver", "-v 3", "0.0.0.0:8000" ]
+CMD [ "python", "manage.py", "runserver", "-v 2", "0.0.0.0:8000" ]
